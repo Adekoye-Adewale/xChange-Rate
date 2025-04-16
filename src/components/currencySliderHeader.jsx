@@ -1,8 +1,9 @@
 'use client'
-import React from 'react'
+import React, { useEffect, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
+import { getExchangeRates } from '@/lib/getExchangeRates';
 
 export default function CurrencySliderHeader() {
         return (
@@ -12,8 +13,30 @@ export default function CurrencySliderHeader() {
         )
 }
 
+const currencyMap = {
+        eur: 'EUR',
+        gbp: 'GBP',
+        ngn: 'NGN',
+        jpy: 'JPY',
+        cny: 'CNY',
+        cad: 'CAD',
+        aud: 'AUD',
+        chf: 'CHF',
+        inr: 'INR',
+        zar: 'ZAR',
+};
 
 const Slider = () => {
+        const [rates, setRates] = useState({});
+
+        useEffect(() => {
+                async function fetchRates() {
+                        const data = await getExchangeRates();
+                        setRates(data);
+                }
+                fetchRates();
+        }, []);
+
         return (
                 <Swiper
                         spaceBetween={20}
@@ -44,18 +67,13 @@ const Slider = () => {
                                         spaceBetween: 40,
                                 },
                         }}
-                        className='swiper-transition cursor-default'
+                        className="swiper-transition cursor-default text-white text-sm font-medium"
                 >
-                        <SwiperSlide>Slide 1</SwiperSlide>
-                        <SwiperSlide>Slide 2</SwiperSlide>
-                        <SwiperSlide>Slide 3</SwiperSlide>
-                        <SwiperSlide>Slide 4</SwiperSlide>
-                        <SwiperSlide>Slide 5</SwiperSlide>
-                        <SwiperSlide>Slide 6</SwiperSlide>
-                        <SwiperSlide>Slide 7</SwiperSlide>
-                        <SwiperSlide>Slide 8</SwiperSlide>
-                        <SwiperSlide>Slide 9</SwiperSlide>
-                        <SwiperSlide>Slide 10</SwiperSlide>
+                        {Object.entries(rates).map(([code, value]) => (
+                                <SwiperSlide key={code}>
+                                        1 {currencyMap[code]} = {value.toFixed(2)} USD
+                                </SwiperSlide>
+                        ))}
                 </Swiper>
         );
 };
